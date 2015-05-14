@@ -1,0 +1,31 @@
+.default {
+	-fx-border-width: .5px;
+	-fx-border-style: solid; 
+}
+
+.grass {
+	-fx-background-color: #00D500;
+	-fx-border-color: #D0E5D0;
+}
+
+.water {
+	-fx-background-color: #4545FF;
+}
+
+.tree {
+	-fx-background-color: #004500;
+}
+
+.selected {
+	-fx-border-width: 3px;
+	-fx-border-color: #FFFFFF;
+}
+
+.current-player {
+	-fx-border-width: 3px;
+	-fx-border-color: #96008F;
+}
+
+.possible-move{
+	-fx-background-color: #00B000;
+}
