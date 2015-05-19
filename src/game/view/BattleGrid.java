@@ -56,7 +56,7 @@ public class BattleGrid extends GridPane {
 				this.add(pane, i, j);
 			}
 		}
-		
+		/*
 		for (Player p : allies) {
 			Image i = new Image(p.getSpriteLocation());
 			ImageView iv = new ImageView(i);
@@ -75,6 +75,7 @@ public class BattleGrid extends GridPane {
 			iv.setPreserveRatio(true);
 			tp.getChildren().add(iv);
 		}
+		*/
 	}
 	
 	private void setCurSelection(TerrainPane p) {

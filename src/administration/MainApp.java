@@ -1,6 +1,6 @@
 package administration;
 
-import game.BattleFieldPage;
+import game.BattleSelectionPage;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,7 +14,7 @@ import vn.StoryPage;
 public class MainApp extends Application {
 	private Stage primaryStage;
 	BorderPane rootLayout;
-	BattleFieldPage battlefieldPage;
+	BattleSelectionPage battlefieldPage;
 	StoryPage campaignPage;
 
 	@Override
@@ -47,10 +47,10 @@ public class MainApp extends Application {
 		//not sure if I like this here, but it has to come after
 		//rootLayout = new BorderPane()
 		//may reorganize later
-		battlefieldPage = new BattleFieldPage(primaryStage, rootLayout);
+		battlefieldPage = new BattleSelectionPage(primaryStage, rootLayout);
 		campaignPage = new StoryPage();
 		
-		Scene scene = new Scene(rootLayout, 1120, 630);
+		Scene scene = new Scene(rootLayout, 1344, 756);
 		scene.getStylesheets().add("stylesheets/main.css");
 		
 		primaryStage.setScene(scene);

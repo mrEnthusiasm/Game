@@ -45,7 +45,7 @@ public class ArtificialIntelligence {
 		// find closest enemy - move towards them
 		Vertex[][] graph = new Vertex[battle.getNumCols()][battle.getNumRows()];
 		PriorityQueue<Vertex> unvisited = new PriorityQueue<Vertex>();
-		Vertex origin = new Vertex(curPlayer.getX(), curPlayer.getY());
+		Vertex origin = new Vertex(curPlayer.getXValue(), curPlayer.getYValue());
 		origin.setDist(0);
 		graph[origin.getX()][origin.getY()] = origin;
 		unvisited.add(origin);
@@ -125,13 +125,13 @@ public class ArtificialIntelligence {
 	}
 
 	private boolean attackNearby() {
-		for (int i = curPlayer.getX() - 1; i < curPlayer.getX() + 2; i++) {
-			for (int j = curPlayer.getY() - 1; j < curPlayer.getY() + 2; j++) {
+		for (int i = curPlayer.getXValue() - 1; i < curPlayer.getXValue() + 2; i++) {
+			for (int j = curPlayer.getYValue() - 1; j < curPlayer.getYValue() + 2; j++) {
 				if (i < 0 || j < 0)
 					continue; // beyond the map
 				if (i >= battle.getNumCols() || j >= battle.getNumRows())
 					continue; // beyond the map
-				if (i == curPlayer.getX() && j == curPlayer.getY())
+				if (i == curPlayer.getXValue() && j == curPlayer.getYValue())
 					continue; // center of 3x3 ie: cur
 				Player p = battle.getPlayerAt(i, j);
 				if (p == null) {

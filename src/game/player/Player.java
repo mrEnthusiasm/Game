@@ -9,9 +9,10 @@ public abstract class Player {
 	protected String sprite;
 	protected String infoPic;
 	protected String name;
+	protected String description;
 	
-	protected int x;
-	protected int y;
+	protected SimpleIntegerProperty x = new SimpleIntegerProperty();
+	protected SimpleIntegerProperty y = new SimpleIntegerProperty();
 	
 	protected SimpleIntegerProperty health = new SimpleIntegerProperty();
 	protected int maxHealth;
@@ -25,11 +26,17 @@ public abstract class Player {
 	protected Attack rangedAttack = null;
 	protected Attack meleeAttack = null;
 	
-	public int getX() {
+	public SimpleIntegerProperty getXProperty() {
 		return x;
 	}
-	public int getY() {
+	public SimpleIntegerProperty getYProperty() {
 		return y;
+	}
+	public int getXValue() {
+		return x.get();
+	}
+	public int getYValue() {
+		return y.get();
 	}
 	public float getMaxMoveDistance() {
 		return maxMoveDist;
@@ -42,6 +49,9 @@ public abstract class Player {
 	}
 	public String getName() {
 		return name;
+	}
+	public String getDescription() {
+		return description;
 	}
 	public ArrayList<Attack> getSpecials(){
 		return specials;
@@ -62,8 +72,8 @@ public abstract class Player {
 		return agilityRating;
 	}
 	public void move(int curSelectedCol, int curSelectedRow) {
-		this.x = curSelectedCol;
-		this.y = curSelectedRow;
+		this.x.set(curSelectedCol);
+		this.y.set(curSelectedRow);
 	}
 	public boolean canMove() {
 		if(actionPoints.get() > 0){
@@ -87,6 +97,5 @@ public abstract class Player {
 	}
 	public void takeArmorDamage(int armorDamage) {
 		armorRating.set(armorRating.get() - armorDamage);
-		
 	}
 }

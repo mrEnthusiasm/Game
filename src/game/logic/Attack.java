@@ -29,6 +29,15 @@ public class Attack {
 	}
 
 	public Attack(AttackType type, int speed, int power, double maxRange,
+			String name, SimpleIntegerProperty damage) {
+		this.type = type;
+		this.speed.set(speed);
+		this.power.set(power);
+		this.maxRange = maxRange;
+		this.name = name;
+		this.damage.bind(damage);
+	}
+	public Attack(AttackType type, int speed, int power, double maxRange,
 			String name, int damage) {
 		this.type = type;
 		this.speed.set(speed);

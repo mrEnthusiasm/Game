@@ -2,6 +2,7 @@ package game.logic;
 
 import game.battles.Map;
 import game.logic.Attack.AttackType;
+import game.player.Blake;
 import game.player.Player;
 
 import java.util.ArrayList;
@@ -38,11 +39,11 @@ public class Battle {
 		this.playerOrder = new ArrayList<Player>();
 
 		for (Player p : allies) {
-			terrain[p.getX()][p.getY()].occupy(p);
+			terrain[p.getXValue()][p.getYValue()].occupy(p);
 		}
 
 		for (Player p : enemies) {
-			terrain[p.getX()][p.getY()].occupy(p);
+			terrain[p.getXValue()][p.getYValue()].occupy(p);
 		}
 
 		if (allies.size() > enemies.size()) {
@@ -89,7 +90,7 @@ public class Battle {
 	private void updateMoves(Player player) {
 		Vertex[][] graph = new Vertex[numCols][numRows];
 		PriorityQueue<Vertex> unvisited = new PriorityQueue<Vertex>();
-		Vertex origin = new Vertex(player.getX(), player.getY());
+		Vertex origin = new Vertex(player.getXValue(), player.getYValue());
 		origin.setDist(0);
 		graph[origin.getX()][origin.getY()] = origin;
 		unvisited.add(origin);
@@ -357,8 +358,8 @@ public class Battle {
 			return false;
 		}
 		if (terrain[col][row].isOccupied()) {
-			int xDist = col - curPlayer.getX();
-			int yDist = row - curPlayer.getY();
+			int xDist = col - curPlayer.getXValue();
+			int yDist = row - curPlayer.getYValue();
 			double totalDist = Math.sqrt(xDist * xDist + yDist * yDist);
 			double range = curPlayer.getMelee().getRange();
 			if (totalDist <= range) {
@@ -376,8 +377,8 @@ public class Battle {
 			return false;
 		}
 		if (terrain[col][row].isOccupied()) {
-			int xDist = col - curPlayer.getX();
-			int yDist = row - curPlayer.getY();
+			int xDist = col - curPlayer.getXValue();
+			int yDist = row - curPlayer.getYValue();
 			double totalDist = Math.sqrt(xDist * xDist + yDist * yDist);
 			if (totalDist <= curPlayer.getRanged().getRange()) {
 				return hasCover(col, row, xDist, yDist);
@@ -405,10 +406,15 @@ public class Battle {
 		return terrain[col][row];
 	}
 
-	public void move(Player movingPlayer, int col, int row) {
+	public void moveCurPlayer(int col, int row) {
+		curPlayer.move(col, row);
+		curPlayer.useActionPoints(1);
+		updateMoves(curPlayer);
+	}
+
+	public void move(Player movingPlayer, int col, int row){
 		movingPlayer.move(col, row);
-		movingPlayer.useActionPoints(1);
-		updateMoves(movingPlayer);
+		updateMoves(curPlayer);
 	}
 
 	/**
@@ -416,7 +422,7 @@ public class Battle {
 	 * @param defender currently selected player
 	 * @param type attack type as specified in Attack class
 	 * @return returns info on if attack succeeded. 0 = death, 1 = damaged, 2 =
-	 *         blocked, 3 = dodgeed
+	 *         blocked, 3 = dodged, 4 = blake dodge
 	 */
 	
 	public int curPlayerAttack(Player defender, AttackType type) {
@@ -452,6 +458,30 @@ public class Battle {
 			}
 			return 2;
 		}
+		//Extra bit of code for Blake
+		if(defender.getClass().equals(Blake.class)){
+			int x;
+			int y;
+			Random rand = new Random();
+			for(int i=0; i<3; i++){
+				for(int j=0; j<3; j++){
+					x = defender.getXValue()-1 + i;
+					y = defender.getYValue()-1 + j;
+					if(x<0 || y<0) continue;
+					if(x>=terrain.length || y>=terrain[0].length) continue;
+					if(x == defender.getXValue() && y == defender.getYValue()) continue;
+					Terrain t = terrain[x][y];
+					if(!t.isOccupied()){
+						if(!t.isTraversable){
+							if(rand.nextInt(5) == 0){
+								move(defender, x, y);
+								return 4;
+							}
+						}
+					}
+				}
+			}
+		}
 		//attack succeeded
 		//subtract a bit of armor
 		if(armorDamage < defender.getArmorRating().get()){
@@ -475,7 +505,7 @@ public class Battle {
 			if(!playerOrder.remove(defender)){
 				System.err.println("COULD NOT FIND DEFENDER IN PLAYER ORDER");
 			}
-			terrain[defender.getX()][defender.getY()].leave();
+			terrain[defender.getXValue()][defender.getYValue()].leave();
 			updateMoves(curPlayer);
 			return 0;
 		}

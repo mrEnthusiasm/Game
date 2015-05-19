@@ -8,6 +8,7 @@ import game.logic.Battle;
 import game.logic.Terrain;
 import game.player.Player;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -40,7 +42,7 @@ public class Battleground extends HBox {
 	private Battle battle;
 	ArtificialIntelligence badGuyBrain;
 
-	BorderPane background;
+	Pane battlefield;
 	BattleGrid battlegrid;
 
 	InfoPane playerPane;
@@ -65,17 +67,21 @@ public class Battleground extends HBox {
 
 		this.getStylesheets().add("stylesheets/Battleground.css");
 
-		background = new BorderPane();
-		background.getStyleClass().add("background");
-		background.setPadding(new Insets(15.0));
-		background.prefHeightProperty().bind(this.heightProperty());
-		background.prefWidthProperty().bind(this.widthProperty().multiply(.75));
-		background.maxWidthProperty().bind(this.widthProperty().multiply(.75));
+		battlefield = new Pane();
+		battlefield.getStyleClass().add("background");
+		battlefield.setPadding(new Insets(15.0));
+		battlefield.prefHeightProperty().bind(this.heightProperty());
+		battlefield.prefWidthProperty()
+				.bind(this.widthProperty().multiply(.75));
+		battlefield.maxWidthProperty().bind(this.widthProperty().multiply(.75));
 
 		this.battlegrid = new BattleGrid(map, allies, enemies);
-		battlegrid.prefHeightProperty().bind(background.heightProperty());
+		battlegrid.prefHeightProperty().bind(battlefield.heightProperty());
 		battlegrid.maxWidthProperty().bind(battlegrid.prefHeightProperty());
-		// battlegrid.minWidthProperty().bind(battlegrid.prefHeightProperty());
+		battlegrid.prefWidthProperty().bind(battlegrid.prefHeightProperty());
+		battlegrid.layoutXProperty().bind(
+				battlefield.widthProperty().divide(2)
+						.subtract(battlegrid.widthProperty().divide(2)));
 		battlegrid.updateSelection.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable,
@@ -91,7 +97,10 @@ public class Battleground extends HBox {
 				}
 			}
 		});
-		background.setCenter(battlegrid);
+		battlefield.getChildren().add(battlegrid);
+
+		addSprites(allies);
+		addSprites(enemies);
 
 		VBox infoPane = new VBox();
 		infoPane.prefWidthProperty().bind(this.widthProperty().multiply(.25));
@@ -172,9 +181,36 @@ public class Battleground extends HBox {
 
 		infoPane.getChildren().addAll(playerPane, actionPane, selectionPane);
 
-		this.getChildren().addAll(background, infoPane);
+		this.getChildren().addAll(battlefield, infoPane);
 
 		setCurPlayer();
+	}
+
+	private void addSprites(List<Player> players) {
+		Iterator<Player> itr = players.iterator();
+		Player currPlayer;
+		ImageView playerImage;
+		TerrainPane refPane = battlegrid.getPaneAt(0, 0);
+		double padding = 5.0;
+		while (itr.hasNext()) {
+			currPlayer = itr.next();
+			playerImage = new ImageView(currPlayer.getSpriteLocation());
+			battlefield.getChildren().add(playerImage);
+
+			//TODO images are centered BUT images themselves aren't square or centered so
+			//appear off
+			playerImage.fitHeightProperty().bind(
+					refPane.heightProperty().subtract(padding*2)); // *2 for top and bottom
+			playerImage.setPreserveRatio(true);
+			playerImage.layoutXProperty().bind(
+					battlegrid.layoutXProperty().add(
+							Bindings.multiply(currPlayer.getXProperty(),
+									refPane.widthProperty()).add(padding)));
+			playerImage.layoutYProperty().bind(
+					battlegrid.layoutYProperty().add(
+							Bindings.multiply(currPlayer.getYProperty(),
+									refPane.widthProperty()).add(padding)));
+		}
 	}
 
 	private void endTurn() {
@@ -218,7 +254,8 @@ public class Battleground extends HBox {
 
 	public void setCurPlayer() {
 		Player p = battle.getCurPlayer();
-		battlegrid.setCurPlayerPane(battlegrid.getPaneAt(p.getX(), p.getY()));
+		battlegrid.setCurPlayerPane(battlegrid.getPaneAt(p.getXValue(),
+				p.getYValue()));
 
 		highlightPossibleMoves();
 
@@ -277,26 +314,17 @@ public class Battleground extends HBox {
 
 	public void moveAction() {
 		TerrainPane oldPane = battlegrid.getCurPlayerPane();
-		oldPane.getChildren().clear();
 		oldPane.getStyleClass().remove("current-player");
 		oldPane.getTerrain().leave();
 
 		Player movingPlayer = battle.getCurPlayer();
-		battle.move(movingPlayer, battlegrid.getCurSelectedCol(),
+		battle.moveCurPlayer(battlegrid.getCurSelectedCol(),
 				battlegrid.getCurSelectedRow());
 
 		TerrainPane newPane = battlegrid.getCurSelectedPane();
 		newPane.getTerrain().occupy(movingPlayer);
 		newPane.getStyleClass().remove("selected");
 		battlegrid.setCurPlayerPane(newPane);
-		Image i = new Image(movingPlayer.getSpriteLocation());
-		ImageView iv = new ImageView(i);
-		iv.fitHeightProperty().bind(
-				newPane.heightProperty().subtract(
-						newPane.getPadding().getTop()
-								+ newPane.getPadding().getBottom()));
-		iv.setPreserveRatio(true);
-		newPane.getChildren().add(iv);
 
 		moveButton.setDisable(true);
 		setCurPlayer();
@@ -305,9 +333,17 @@ public class Battleground extends HBox {
 	public void meleeAction(Player defender) {
 		int result = battle.curPlayerAttack(defender, AttackType.MELEE);
 		int end = battle.checkForEndGame();
+		if (result == 4) {
+			TerrainPane oldPane = battlegrid.getPaneAt(defender.getXValue(),
+					defender.getYValue());
+			oldPane.getChildren().clear();
+			oldPane.getTerrain().leave();
+
+			// TODO need to move icon to new square
+		}
 		if (result == 0) {
-			TerrainPane pane = battlegrid.getPaneAt(defender.getX(),
-					defender.getY());
+			TerrainPane pane = battlegrid.getPaneAt(defender.getXValue(),
+					defender.getYValue());
 			pane.getChildren().clear();
 			selectionPane.clear();
 			// check if game over
@@ -354,16 +390,16 @@ public class Battleground extends HBox {
 		}
 
 		// need to update actions because used Action Point
-		updateActions(defender.getX(), defender.getY());
+		updateActions(defender.getXValue(), defender.getYValue());
 	}
 
 	private void rangedAction(Player defender) {
 		int result = battle.curPlayerAttack(defender, AttackType.RANGED);
-		updateActions(defender.getX(), defender.getY());
+		updateActions(defender.getXValue(), defender.getYValue());
 
 		if (result == 0) {
-			TerrainPane pane = battlegrid.getPaneAt(defender.getX(),
-					defender.getY());
+			TerrainPane pane = battlegrid.getPaneAt(defender.getXValue(),
+					defender.getYValue());
 			pane.getChildren().clear();
 			selectionPane.clear();
 			// check if game over
@@ -411,7 +447,7 @@ public class Battleground extends HBox {
 		}
 
 		// need to update actions because used Action Point
-		updateActions(defender.getX(), defender.getY());
+		updateActions(defender.getXValue(), defender.getYValue());
 	}
 
 	// AI INTERACTION TOOLS

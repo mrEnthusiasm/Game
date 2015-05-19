@@ -3,12 +3,12 @@ package game.battles;
 import java.util.ArrayList;
 import java.util.List;
 
-import game.BattleFieldPage;
+import game.BattleSelectionPage;
 import game.player.Player;
 import game.view.Battleground;
 
 public abstract class Level {
-	BattleFieldPage battlefieldPage;
+	BattleSelectionPage battlefieldPage;
 	Battleground battleground;
 	
 	List<Player> allies = new ArrayList<Player>();
@@ -16,7 +16,7 @@ public abstract class Level {
 	
 	Map myMap;
 	
-	public Level(BattleFieldPage battlefieldPage) {
+	public Level(BattleSelectionPage battlefieldPage) {
 		this.battlefieldPage = battlefieldPage;
 		retry();
 		

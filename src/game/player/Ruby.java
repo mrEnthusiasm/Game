@@ -8,14 +8,16 @@ public class Ruby extends Player {
 		sprite = "resources/images/r-test-sprite.png";
 		infoPic = "resources/images/info-pic-ruby.png";
 		name = "Ruby";
+		this.description = "blink and you'll miss her, Ruby's semblence allows her "
+				+ "to move so fast she ignores enemy's area of control";
 
 		maxHealth = 100;
 		health.set(maxHealth);
 		armorRating.set(20);
 		agilityRating.set(10);
 
-		this.x = x;
-		this.y = y;
+		this.x.set(x);
+		this.y.set(y);
 
 		actionPoints.setValue(2);
 

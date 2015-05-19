@@ -1,13 +1,13 @@
 package game.battles;
 
-import game.BattleFieldPage;
+import game.BattleSelectionPage;
 import game.logic.WaterTerrain;
 import game.player.Beowolf;
 import game.player.Ruby;
 
 public class LevelTwo extends Level{
 
-	public LevelTwo(BattleFieldPage battlefieldPage) {
+	public LevelTwo(BattleSelectionPage battlefieldPage) {
 		super(battlefieldPage);
 		// TODO Auto-generated constructor stub
 	}

@@ -2,14 +2,14 @@ package game.battles;
 
 import java.util.Random;
 
-import game.BattleFieldPage;
+import game.BattleSelectionPage;
 import game.logic.TreeTerrain;
 import game.player.Beowolf;
 import game.player.Ruby;
 
 public class LevelThree extends Level{
 
-	public LevelThree(BattleFieldPage battlefieldPage) {
+	public LevelThree(BattleSelectionPage battlefieldPage) {
 		super(battlefieldPage);
 		// TODO Auto-generated constructor stub
 	}

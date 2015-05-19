@@ -10,30 +10,38 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
-public class AttackInfoPane extends Pane{
+public class AttackInfoPane extends TextFlow{
 	Text name = new Text();
 	Text type = new Text();
 	Text speed = new Text();
 	Text power = new Text();
 	Text range = new Text();
 	Text damage = new Text();
-	Text description = new Text();
 	
 	DoubleProperty paneHeight = new SimpleDoubleProperty();
 	public AttackInfoPane(Attack attack){
 		//top, right, bottom, left
 		setPadding(new Insets(3.0, 3.0, 3.0, 3.0));
-		double padding = 3.0;
 		
-		name.textProperty().set(attack.getName());
-		type.textProperty().set(attack.getType().toString());
-		speed.textProperty().bind(Bindings.format("speed %d", attack.getSpeedProperty()));
-		power.textProperty().bind(Bindings.format("power %d", attack.getPowerPorperty()));
-		range.textProperty().set("max range "+ (int)attack.getRange());
-		damage.textProperty().bind(Bindings.format("damage %d", attack.getDamageProperty()));
-		description.setText(attack.getDescription());
+		name.textProperty().set(attack.getName()+"  ");
+		name.setFont(new Font(20.0));
+		type.textProperty().set(attack.getType().toString()+"\n");
+		type.setFont(new Font(15.0));
+		damage.textProperty().bind(Bindings.format("%d dmg\t", attack.getDamageProperty()));
+		damage.setFont(new Font(15.0));
+		range.textProperty().set("max range "+ (int)attack.getRange()+"\n");
+		range.setFont(new Font(15.0));
+		speed.textProperty().bind(Bindings.format("speed %d\t", attack.getSpeedProperty()));
+		speed.setFont(new Font(15.0));
+		power.textProperty().bind(Bindings.format("power %d ", attack.getPowerPorperty()));
+		power.setFont(new Font(15.0));
 		
+		
+		this.getChildren().addAll(name, type, damage, range, speed, power);
+		
+		/*
 		name.setTextOrigin(VPos.TOP);
 		name.setFont(new Font(20));
 		name.wrappingWidthProperty().bind(this.widthProperty().divide(2.0));
@@ -61,9 +69,8 @@ public class AttackInfoPane extends Pane{
 		range.setTextOrigin(VPos.TOP);
 		range.setFont(new Font(14));
 		range.yProperty().bind(speed.yProperty().add(speed.getFont().getSize()));
+		*/
 		
-		
-		getChildren().addAll(name, type, damage, speed, power, range);
 	}
 
 }

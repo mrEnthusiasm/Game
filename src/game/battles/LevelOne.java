@@ -1,12 +1,13 @@
 package game.battles;
 
-import game.BattleFieldPage;
+import game.BattleSelectionPage;
 import game.player.Beowolf;
+import game.player.Blake;
 import game.player.Ruby;
 
 public class LevelOne extends Level{
 
-	public LevelOne(BattleFieldPage battlefieldPage) {
+	public LevelOne(BattleSelectionPage battlefieldPage) {
 		super(battlefieldPage);
 		// TODO Auto-generated constructor stub
 	}

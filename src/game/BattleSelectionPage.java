@@ -11,12 +11,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class BattleFieldPage extends BorderPane{
+public class BattleSelectionPage extends BorderPane{
 	public Stage primaryStage;
 	BorderPane mainMenu;
 	VBox battles;
 	
-	public BattleFieldPage(Stage primaryStage, BorderPane mainMenu){
+	public BattleSelectionPage(Stage primaryStage, BorderPane mainMenu){
 		this.primaryStage = primaryStage;
 		this.mainMenu = mainMenu;
 		
