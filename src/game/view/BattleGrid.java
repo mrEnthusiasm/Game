@@ -1,28 +1,19 @@
 package game.view;
 
 import game.battles.Map;
-import game.logic.Terrain;
 import game.player.Player;
 
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.StackPane;
 
 public class BattleGrid extends GridPane {
 	private TerrainPane curSelection;

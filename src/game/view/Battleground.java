@@ -3,52 +3,32 @@ package game.view;
 import game.battles.Level;
 import game.battles.Map;
 import game.logic.ArtificialIntelligence;
+import game.logic.Attack.AttackType;
 import game.logic.Battle;
 import game.logic.Terrain;
-import game.logic.Attack.AttackType;
 import game.player.Player;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.IntegerBinding;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
 
@@ -261,11 +241,6 @@ public class Battleground extends HBox {
 	}
 
 	private void updateActions(int col, int row) {
-		for (int i = 0; i < columns; i++) {
-			for (int j = 0; j < rows; j++) {
-				battlegrid.getPaneAt(i, j).getStyleClass().remove("line-of-sight");
-			}
-		}
 		if (battle.curPlayerCanMoveTo(col, row)) {
 			moveButton.setDisable(false);
 		} else {
@@ -283,15 +258,13 @@ public class Battleground extends HBox {
 		}
 
 		if (battle.getCurPlayer().getRanged() != null) {
-			ArrayList<int[]> squares = battle.curPlayerCanRanged(col, row);
-			if(squares == null){
-				return;
+			if (battle.curPlayerCanRanged(col, row)) {
+				rangedButton.setDisable(false);
+			} else {
+				rangedButton.setDisable(true);
 			}
-			Iterator<int[]> itr = squares.iterator();
-			while(itr.hasNext()){
-				int[] square = itr.next();
-				battlegrid.getPaneAt(square[0], square[1]).getStyleClass().add("line-of-sight");
-			}
+		} else {
+			rangedButton.setDisable(true);
 		}
 	}
 

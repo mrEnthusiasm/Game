@@ -1,14 +1,12 @@
 package game.view;
 
-import java.util.Iterator;
-
 import game.logic.Attack;
 import game.logic.Terrain;
 import game.player.Player;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+
+import java.util.Iterator;
+
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.image.Image;

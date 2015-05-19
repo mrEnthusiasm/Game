@@ -5,14 +5,10 @@ import game.logic.Attack.AttackType;
 import game.player.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
-
-import javafx.beans.property.IntegerProperty;
 
 public class Battle {
 	private Terrain[][] terrain;
@@ -68,7 +64,6 @@ public class Battle {
 		round = 0;
 		curPlayer = playerOrder.get(0);
 		updateMoves(curPlayer);
-		//alliesTurnNext = false;
 	}
 
 	public void nextPlayer() {
@@ -86,6 +81,11 @@ public class Battle {
 		updateMoves(curPlayer);
 	}
 
+	/**
+	 * variation on Dijkstra's algorithm, used to find all squares with path lengths 
+	 * less than player's max move distance and update curPlayerMoves array
+	 * @param player
+	 */
 	private void updateMoves(Player player) {
 		Vertex[][] graph = new Vertex[numCols][numRows];
 		PriorityQueue<Vertex> unvisited = new PriorityQueue<Vertex>();
@@ -181,6 +181,7 @@ public class Battle {
 			}
 		}
 
+		//update curplayerMoves array
 		for (int i = 0; i < numCols; i++) {
 			for (int j = 0; j < numRows; j++) {
 				if (graph[i][j] != null) {
@@ -236,9 +237,13 @@ public class Battle {
 	 * @param xDist distance to target along x axis
 	 * @param yDist distance to target along y axis
 	 */
-	private ArrayList<int[]> hasCover(int col, int row, int xDist, int yDist) {
-		ArrayList<int[]> squares = new ArrayList<int[]>();
-		int[] coordinates;
+	private boolean hasCover(int col, int row, int xDist, int yDist) {
+		/*
+		 * TODO Have a cascade problem of being under cover in a line
+		 * for example R can not shoot any of G because of T and cover rules
+		 *  R
+		 *     TGGGGGGGGGGGGGGGGG
+		 */
 		int gcd = Math.abs(findGCD(xDist, yDist));
 		int rise = yDist / gcd;
 		int run = xDist / gcd;
@@ -258,110 +263,78 @@ public class Battle {
 		double extra = 0.5;
 		int step;
 		if (m < 1 && m > -1) { // horizontal
-			if (run % 2 == 1 && rise % 2 == 1) {
+			if (Math.abs(run) % 2 == 1 && Math.abs(rise) % 2 == 1) {
 				intersection = true;
-				intersect = 0.5 * run;
+				intersect = Math.abs(run);
+				count = (int)(Math.abs(run)*0.5);
 			}
 			extra += (Math.abs(m) / 2); // moving to edge of square
 			step = run / Math.abs(run); // normalizes the vector
 			while (true) {
 				curX += step;
 				count++;
-				if (intersection && count > intersect) {
+				if (intersection && (count == intersect)) {
 					curY += Math.signum(rise);
-					extra = (extra + m) - 1;
+					extra = Math.abs(m);
 					count = 0;
+					if (providesCover(curX, curY)) {
+						return false;
+					}
+					continue;
 				}
 				if (curX == col && curY == row) {
-					coordinates = new int[2];
-					coordinates[0] = curX;
-					coordinates[1] = curY;
-					squares.add(coordinates);
-					return squares;
+					return true;
 				} else {
 					if (providesCover(curX, curY)) {
-						coordinates = new int[2];
-						coordinates[0] = curX;
-						coordinates[1] = curY;
-						squares.add(coordinates);
-						return squares;
-					}else{
-						coordinates = new int[2];
-						coordinates[0] = curX;
-						coordinates[1] = curY;
-						squares.add(coordinates);
+						return false;
 					}
 				}
 				extra += Math.abs(m);
-				if (extra > 1) {
+				if (extra > 1 && (count+1 != intersect)) {
 					curY += Math.signum(rise);
 					// will never equal destination from extra move
 					if (providesCover(curX, curY)) {
-						coordinates = new int[2];
-						coordinates[0] = curX;
-						coordinates[1] = curY;
-						squares.add(coordinates);
-						return squares;
+						return false;
 					}else{
-						coordinates = new int[2];
-						coordinates[0] = curX;
-						coordinates[1] = curY;
-						squares.add(coordinates);
 						extra -= 1;
 					}
 				}
 			}
 		} else if (m > 1 || m < -1) { // vertical
-			if (run % 2 == 1 && rise % 2 == 1) {
+			if (Math.abs(run) % 2 == 1 && Math.abs(rise) % 2 == 1) {
 				intersection = true;
-				intersect = 0.5 * rise;
+				intersect = Math.abs(rise);
+				count = (int)(Math.abs(rise)*0.5);
 			}
 			extra += (1 / (Math.abs(m) * 2)); // moving to edge of square
 			step = rise / Math.abs(rise); // normalizes the vector
 			while (true) {
 				curY += step;
 				count++;
-				if (intersection && (count>intersect)) {
+				if (intersection && (count==intersect)) {
 					curX += Math.signum(run);
-					extra = (extra + (1 / Math.abs(m))) - 1;
+					extra = 1 / Math.abs(m);
 					count = 0;
+					if (providesCover(curX, curY)) {
+						return false;
+					}
+					continue;
 				}
 				if (curX == col && curY == row) {
-					coordinates = new int[2];
-					coordinates[0] = curX;
-					coordinates[1] = curY;
-					squares.add(coordinates);
-					return squares;
+					return true;
 				} else {
 					if (providesCover(curX, curY)) {
-						coordinates = new int[2];
-						coordinates[0] = curX;
-						coordinates[1] = curY;
-						squares.add(coordinates);
-						return squares;
-					}else{
-						coordinates = new int[2];
-						coordinates[0] = curX;
-						coordinates[1] = curY;
-						squares.add(coordinates);
+						return false;
 					}
 				}
 				extra += (1 / Math.abs(m));
-				if (extra > 1) {
+				if (extra > 1 && (count+1 != intersect)) {
 					curX += Math.signum(run);
 					// will never equal destination from extra move
 					if (providesCover(curX, curY)) {
-						coordinates = new int[2];
-						coordinates[0] = curX;
-						coordinates[1] = curY;
-						squares.add(coordinates);
-						return squares;
+						return false;
 					}else{
 						extra -= 1;
-						coordinates = new int[2];
-						coordinates[0] = curX;
-						coordinates[1] = curY;
-						squares.add(coordinates);
 					}
 				}
 			}
@@ -370,28 +343,10 @@ public class Battle {
 				curX += Math.signum(run);
 				curY += Math.signum(rise);
 				if (curX == col && curY == row) {
-					coordinates = new int[2];
-					coordinates[0] = curX;
-					coordinates[1] = curY;
-					squares.add(coordinates);
-					return squares;
-				}else{
-					coordinates = new int[2];
-					coordinates[0] = curX;
-					coordinates[1] = curY;
-					squares.add(coordinates);
+					return true;
 				}
 				if (providesCover(curX, curY)) {
-					coordinates = new int[2];
-					coordinates[0] = curX;
-					coordinates[1] = curY;
-					squares.add(coordinates);
-					return squares;
-				}else{
-					coordinates = new int[2];
-					coordinates[0] = curX;
-					coordinates[1] = curY;
-					squares.add(coordinates);
+					return false;
 				}
 			}
 		}
@@ -416,9 +371,9 @@ public class Battle {
 		}
 	}
 
-	public ArrayList<int[]> curPlayerCanRanged(int col, int row) {
+	public boolean curPlayerCanRanged(int col, int row) {
 		if (curPlayer.getActionPoints() == 0) {
-			return null;
+			return false;
 		}
 		if (terrain[col][row].isOccupied()) {
 			int xDist = col - curPlayer.getX();
@@ -427,10 +382,10 @@ public class Battle {
 			if (totalDist <= curPlayer.getRanged().getRange()) {
 				return hasCover(col, row, xDist, yDist);
 			} else {
-				return null;
+				return false;
 			}
 		} else {
-			return null;
+			return false;
 		}
 	}
 

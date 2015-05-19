@@ -5,13 +5,11 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 
 public class AttackInfoPane extends Pane{
 	Text name = new Text();

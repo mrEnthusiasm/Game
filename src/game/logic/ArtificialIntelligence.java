@@ -1,12 +1,10 @@
 package game.logic;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.PriorityQueue;
-
-import game.logic.Attack.AttackType;
 import game.player.Player;
 import game.view.Battleground;
+
+import java.util.Iterator;
+import java.util.PriorityQueue;
 
 /**
  * Class describing computer controlled players. Should interact with game state

@@ -1,19 +1,15 @@
 package administration;
 
 import game.BattleFieldPage;
-import vn.StoryPage;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import vn.StoryPage;
 
 public class MainApp extends Application {
 	private Stage primaryStage;
