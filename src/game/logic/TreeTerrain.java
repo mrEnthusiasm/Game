@@ -1,5 +1,6 @@
 package game.logic;
 
+
 public class TreeTerrain extends Terrain{
 	public TreeTerrain(){
 		css = "tree";

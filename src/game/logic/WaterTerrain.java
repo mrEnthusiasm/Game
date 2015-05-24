@@ -1,5 +1,6 @@
 package game.logic;
 
+
 public class WaterTerrain extends Terrain{
 	public WaterTerrain(){
 		css = "water";

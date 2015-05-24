@@ -43,6 +43,6 @@ public class Weiss extends Player{
 		Attack iceShot = new Attack(AttackType.RANGED, speed, power, maxRange,
 				name, damage);
 		this.rangedAttack = iceShot;
-		rangedStatusEffect = StatusType.FROZEN;
+		rangedStatusEffect = new FrozenStatus();
 	}
 }

@@ -3,11 +3,11 @@ package game.view;
 import game.battles.Level;
 import game.battles.Map;
 import game.logic.ArtificialIntelligence;
+import game.logic.Terrain;
 import game.logic.Attack.AttackType;
 import game.logic.Battle;
-import game.logic.Terrain;
 import game.player.Player;
-import game.player.StatusType;
+import game.player.PlayerStatus;
 
 import java.util.Iterator;
 import java.util.List;
@@ -234,11 +234,11 @@ public class Battleground extends HBox {
 	}
 
 	private void endTurn() {
-
 		if (battlegrid.getCurSelectedPane() != null) {
 			battlegrid.clearCurSelection();
 			selectionPane.clear();
 		}
+		battle.updatePlayers();
 		TerrainPane tp = battlegrid.getCurPlayerPane();
 		tp.getStyleClass().removeAll("current-player");
 		actionPoints.textProperty().unbind();
@@ -385,12 +385,8 @@ public class Battleground extends HBox {
 		} else if (result == 2) { // defender blocked
 			onActionComplete();
 		} else if (result == 1) { // defender hit
-			StatusType effect = battle.getCurPlayer().getMeleeStatusEffect();
-			switch (effect) {
-			case FROZEN:
-				defender.setFrozen();
-			default: // no status effect
-			}
+			PlayerStatus effect = battle.getCurPlayer().getMeleeStatusEffect();
+			defender.addStatusEffect(effect, battle.getNumberOfPlayers());
 			onActionComplete();
 		} else if (result == 0) { // defender hit and dies
 			battlefield.getChildren().remove(defender.getPlayerImage());
@@ -432,12 +428,8 @@ public class Battleground extends HBox {
 		} else if (result == 2) { // defender blocked
 			onActionComplete();
 		} else if (result == 1) { // defender hit
-			StatusType effect = battle.getCurPlayer().getRangedStatusEffect();
-			switch (effect) {
-			case FROZEN:
-				defender.setFrozen();
-			default: // no status effect
-			}
+			PlayerStatus effect = battle.getCurPlayer().getMeleeStatusEffect();
+			defender.addStatusEffect(effect, battle.getNumberOfPlayers());
 			onActionComplete();
 		} else if (result == 0) { // defender died
 			battlefield.getChildren().remove(defender.getPlayerImage());

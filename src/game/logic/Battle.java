@@ -12,13 +12,9 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
 
-import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.animation.Transition;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.util.Duration;
 
 public class Battle {
@@ -489,6 +485,7 @@ public class Battle {
 		//subtract a bit of armor
 		if(armorDamage < defender.getArmorRating().get()){
 			defender.takeArmorDamage(armorDamage);
+			
 		} else {
 			defender.getArmorRating().set(0);
 		}
@@ -570,5 +567,15 @@ public class Battle {
 			return 0;
 		}
 		
+	}
+	
+	public int getNumberOfPlayers() {
+		return playerOrder.size();
+	}
+	
+	public void updatePlayers() {
+		for(Player p: playerOrder){
+			p.onTurnOver();
+		}
 	}
 }

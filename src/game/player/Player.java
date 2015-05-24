@@ -29,13 +29,12 @@ public abstract class Player {
 	protected Attack rangedAttack = null;
 	protected Attack meleeAttack = null;
 
-	private double agilityModifier = 1.0;
-	private double movementModifier = 1.0;
+	private SimpleDoubleProperty agilityModifier = new SimpleDoubleProperty();
+	private SimpleDoubleProperty movementModifier = new SimpleDoubleProperty();
 
-	protected ArrayList<StatusType> playerStatus = new ArrayList<StatusType>();
-	protected StatusType rangedStatusEffect;
-	protected StatusType meleeStatusEffect;
-	
+	protected ArrayList<PlayerStatus> playerStatus = new ArrayList<PlayerStatus>();
+	protected PlayerStatus rangedStatusEffect;
+	protected PlayerStatus meleeStatusEffect;
 
 	public SimpleDoubleProperty getXProperty() {
 		return x;
@@ -156,51 +155,64 @@ public abstract class Player {
 
 	private double statusAdjustment(StatType stat) {
 		double adjustment = 1.0;
-		for (StatusType status : playerStatus) {
-			adjustment *= status.getAdjustment(stat);
+		double temp;
+		for (PlayerStatus status : playerStatus) {
+			temp = status.getAdjustment(stat);
+			if(temp == -1.0) return -1.0;
+			adjustment *= temp;
+			
 		}
 		return adjustment;
 	}
 	
+
 	private void updateStatus() {
 		double adjustment;
 		for (StatType stat : StatType.values()) {
 			adjustment = statusAdjustment(stat);
 			if(adjustment == -1.0){
-				System.err.println("BAD ADJUSTMENT VALUE");
+				System.err.println("BAD ADJUSTMENT");
 				return;
 			}
 			switch (stat) {
 			case AGILITY:
-				agilityModifier = adjustment;
+				agilityModifier.set(adjustment);
 				break;
 			case MOVEMENT:
-				movementModifier = adjustment;
+				movementModifier.set(adjustment);
 				break;
 			}
 		}
 	}
-	
-	public StatusType getRangedStatusEffect() {
+
+	public PlayerStatus getRangedStatusEffect() {
 		return rangedStatusEffect;
 	}
-	
-	public StatusType getMeleeStatusEffect() {
+
+	public PlayerStatus getMeleeStatusEffect() {
 		return meleeStatusEffect;
 	}
-
-	public void setFrozen() {
-		playerStatus.add(StatusType.FROZEN);
-		System.out.println("freezing");
-		updateStatus();
-		
-	}
-	
-	public void removeFrozen() {
-		if(!playerStatus.remove(StatusType.FROZEN)){
-			System.err.println("FROZEN STATUS NOT FOUND, COULD NOT REMOVE");
-			return;
+	/**
+	 * run after every Player's turn complete. could use a better name.
+	 */
+	public void onTurnOver () {
+		boolean statusChanged = false;
+		for(PlayerStatus status: playerStatus){
+			status.decrementTurnsLeft();
+			if(status.isExpired()){
+				playerStatus.remove(status);
+				statusChanged = true;
+			}
 		}
+		if(statusChanged){
+			updateStatus();
+		}
+	}
+
+	public void addStatusEffect(PlayerStatus status, int numPlayers) {
+		status.setTurnsLeft(numPlayers);
+		playerStatus.add(status);
 		updateStatus();
+
 	}
 }
