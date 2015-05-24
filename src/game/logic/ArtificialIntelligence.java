@@ -26,22 +26,15 @@ public class ArtificialIntelligence {
 		this.terrain = battle.getTerrain();
 		this.battleground = battleground;
 	}
-
-	public int run() {
+	
+	public void performAction() {
 		curPlayer = battle.getCurPlayer();
-		while (curPlayer.getActionPoints() != 0) {
-			if (attackNearby()) {
-				continue;
-			} else {
-				if (moveTowardsClosestEnemy() == 0) {
-					return 0;
-				}
-			}
-		}
-		return 1;
+		if(attackNearby());
+		else if(moveTowardsClosestEnemy());
+		else System.err.println("NO AI ACTION PERFORMED");
 	}
 
-	private int moveTowardsClosestEnemy() {
+	private boolean moveTowardsClosestEnemy() {
 		// find closest enemy - move towards them
 		Vertex[][] graph = new Vertex[battle.getNumCols()][battle.getNumRows()];
 		PriorityQueue<Vertex> unvisited = new PriorityQueue<Vertex>();
@@ -68,8 +61,8 @@ public class ArtificialIntelligence {
 							// follow path back to max move distance
 							Vertex v = moveOnPath(cur);
 							battleground.AISelectPane(v.getX(), v.getY());
-							battleground.moveAction();
-							return 1;
+							battleground.AIMove();
+							return true;
 						} else {
 							// square occupied by ally
 							continue;
@@ -113,7 +106,7 @@ public class ArtificialIntelligence {
 				}
 			}
 		}
-		return 0;
+		return false;
 	}
 
 	private Vertex moveOnPath(Vertex v) {
@@ -138,7 +131,8 @@ public class ArtificialIntelligence {
 					continue;
 				} else {
 					if (battle.isGoodGuy(p)) {
-						battleground.meleeAction(p);
+						battleground.AISelectPane(p.getXValue(), p.getYValue());
+						battleground.AIMelee(p);
 						return true;
 					}
 				}

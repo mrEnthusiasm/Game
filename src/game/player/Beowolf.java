@@ -5,7 +5,7 @@ import game.logic.Attack.AttackType;
 
 public class Beowolf extends Player {
 	public Beowolf(int x, int y) {
-		sprite = "resources/images/g-test-sprite.png";
+		sprite = "resources/images/grimm-sprite.png";
 		infoPic = "resources/images/info-pic-beowolf.png";
 		name = "Beowolf";
 		description = "simple enough to deal with on there own, Beowolves become a real "
@@ -20,7 +20,7 @@ public class Beowolf extends Player {
 		agilityRating.set(1);
 
 		actionPoints.setValue(2);
-		maxMoveDist = 4;
+		maxMoveDist.setValue(4);
 
 		int speed = 13;
 		int power = 10;

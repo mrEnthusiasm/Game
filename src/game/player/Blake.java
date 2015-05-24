@@ -5,7 +5,7 @@ import game.logic.Attack.AttackType;
 
 public class Blake extends Player{
 	public Blake(int x, int y){
-		sprite = "resources/images/b-test-sprite.png";
+		sprite = "resources/images/blake-sprite.png";
 		infoPic = "resources/images/info-pic-blake.jpg";
 		name = "Blake";
 		description = "A shadow in the night, her semblemce allows her an extra "
@@ -21,8 +21,7 @@ public class Blake extends Player{
 		
 		actionPoints.setValue(2);
 		
-		maxMoveDist = 5;
-		
+		maxMoveDist.setValue(5);
 		int speed = 12;
 		int power = 13;
 		// need a range > sqrt(2) so that diagonal attacks possible but no need

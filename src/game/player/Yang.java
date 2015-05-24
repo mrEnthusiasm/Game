@@ -7,6 +7,10 @@ import game.logic.Attack.AttackType;
 public class Yang extends Player{
 	SimpleIntegerProperty meleeDamage;
 	public Yang(int x, int y){
+		sprite = "resources/images/yang-sprite.png";
+		//TODO get yang info pic
+		infoPic = "";
+		name = "Weiss";
 		name = "Yang";
 		description = "The only thing more painful than her puns are her punches. "
 				+ "Yang's melee attack increases in damage for every hit she takes";
@@ -21,7 +25,7 @@ public class Yang extends Player{
 		
 		actionPoints.setValue(2);
 		
-		maxMoveDist = 4;
+		maxMoveDist.setValue(4);
 		
 		int speed = 8;
 		int power = 17;

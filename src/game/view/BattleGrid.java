@@ -56,26 +56,7 @@ public class BattleGrid extends GridPane {
 				this.add(pane, i, j);
 			}
 		}
-		/*
-		for (Player p : allies) {
-			Image i = new Image(p.getSpriteLocation());
-			ImageView iv = new ImageView(i);
-			TerrainPane tp = grid[p.getX()][p.getY()];
-			iv.fitHeightProperty().bind(tp.heightProperty().subtract(
-					tp.getPadding().getTop()+tp.getPadding().getBottom()));
-			iv.setPreserveRatio(true);
-			tp.getChildren().add(iv);
-		}
-		for (Player p : enemies) {
-			Image i = new Image(p.getSpriteLocation());
-			ImageView iv = new ImageView(i);
-			TerrainPane tp = grid[p.getX()][p.getY()];
-			iv.fitHeightProperty().bind(tp.heightProperty().subtract(
-					tp.getPadding().getTop()+tp.getPadding().getBottom()));
-			iv.setPreserveRatio(true);
-			tp.getChildren().add(iv);
-		}
-		*/
+		
 	}
 	
 	private void setCurSelection(TerrainPane p) {
@@ -129,6 +110,11 @@ public class BattleGrid extends GridPane {
 	public void clearCurSelection() {
 		curSelection.getStyleClass().remove("selected");
 		curSelection = null;
-		
+	}
+	public int getGridWidth() {
+		return width;
+	}
+	public int getGridHeight() {
+		return height;
 	}
 }

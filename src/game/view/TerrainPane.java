@@ -11,12 +11,9 @@ public class TerrainPane extends StackPane {
 		this.terrain = t;
 		this.getStylesheets().add("stylesheets/TerrainPane.css");
 		this.getStyleClass().add("default");
-
-		this.setPadding(new Insets(3.0));
 		this.setMaxSize(200, 200);
 		this.setMinSize(25.0, 25.0);
-		this.prefWidthProperty().bind(this.heightProperty());
-		this.prefHeightProperty().bind(this.widthProperty());
+		this.setSnapToPixel(false);
 		
 		//Customize pane for specific terrain
 		this.getStyleClass().add(t.getCss());

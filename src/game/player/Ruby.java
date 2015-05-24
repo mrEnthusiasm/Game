@@ -5,10 +5,10 @@ import game.logic.Attack.AttackType;
 
 public class Ruby extends Player {
 	public Ruby(int x, int y) {
-		sprite = "resources/images/r-test-sprite.png";
+		sprite = "resources/images/ruby-sprite.png";
 		infoPic = "resources/images/info-pic-ruby.png";
 		name = "Ruby";
-		this.description = "blink and you'll miss her, Ruby's semblence allows her "
+		this.description = "Blink and you'll miss her, Ruby's semblence allows her "
 				+ "to move so fast she ignores enemy's area of control";
 
 		maxHealth = 100;
@@ -21,8 +21,7 @@ public class Ruby extends Player {
 
 		actionPoints.setValue(2);
 
-		maxMoveDist = 6;
-
+		maxMoveDist.setValue(6);
 		int speed = 10;
 		int power = 15;
 		// need a range > sqrt(2) so that diagonal attacks possible but no need

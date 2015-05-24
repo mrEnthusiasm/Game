@@ -4,12 +4,22 @@ import game.battles.Map;
 import game.logic.Attack.AttackType;
 import game.player.Blake;
 import game.player.Player;
+import game.player.Ruby;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
+
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.animation.Transition;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.util.Duration;
 
 public class Battle {
 	private Terrain[][] terrain;
@@ -22,7 +32,7 @@ public class Battle {
 	private int round;
 	private int totalRounds;
 	private Player curPlayer;
-	private Boolean[][] curPlayerMoves;
+	private Vertex[][] curPlayerMoves;
 	private boolean alliesTurn = true;
 	
 	Random rand = new Random();
@@ -31,7 +41,7 @@ public class Battle {
 		this.numCols = map.getNumberColumns();
 		this.numRows = map.getNumberRows();
 
-		curPlayerMoves = new Boolean[numCols][numRows];
+		curPlayerMoves = new Vertex[numCols][numRows];
 		terrain = map.getTerrain();
 
 		this.allies = allyList;
@@ -64,7 +74,7 @@ public class Battle {
 		// Start Battle
 		round = 0;
 		curPlayer = playerOrder.get(0);
-		updateMoves(curPlayer);
+		updateMoves(curPlayer, curPlayer.getXValue(), curPlayer.getYValue());
 	}
 
 	public void nextPlayer() {
@@ -79,7 +89,7 @@ public class Battle {
 		}else{
 			alliesTurn = false;
 		}
-		updateMoves(curPlayer);
+		updateMoves(curPlayer, curPlayer.getXValue(), curPlayer.getYValue());
 	}
 
 	/**
@@ -87,10 +97,10 @@ public class Battle {
 	 * less than player's max move distance and update curPlayerMoves array
 	 * @param player
 	 */
-	private void updateMoves(Player player) {
+	public void updateMoves(Player player, int startingCol, int startingRow) {
 		Vertex[][] graph = new Vertex[numCols][numRows];
 		PriorityQueue<Vertex> unvisited = new PriorityQueue<Vertex>();
-		Vertex origin = new Vertex(player.getXValue(), player.getYValue());
+		Vertex origin = new Vertex(startingCol, startingRow);
 		origin.setDist(0);
 		graph[origin.getX()][origin.getY()] = origin;
 		unvisited.add(origin);
@@ -115,10 +125,11 @@ public class Battle {
 					if (t.isOccupied()) {
 						if (alliesTurn) {// good guys turn
 							if (enemies.contains(t.getResident())
-									&& (cur != origin)) {
+									&& (cur != origin)
+									&& player.getClass() != Ruby.class) {
 								// square is in 'area of control' of enemy
-								// player
-								// thus is a dead end unless origin square
+								// player thus is a dead end unless origin square
+								// but Ruby is special so she get's to ignore it
 								cur.getNeighbors().clear();
 								stop = true; // to break out of outer for loop
 								break;
@@ -175,6 +186,7 @@ public class Battle {
 				}
 				if (cur.getDist() + cost < neighbor.getDist()) {
 					neighbor.setDist(cur.getDist() + cost);
+					neighbor.setPrevious(cur);
 					// re-add vertex because priorityqueue does not have a
 					// decrease priority function
 					unvisited.add(neighbor);
@@ -186,14 +198,9 @@ public class Battle {
 		for (int i = 0; i < numCols; i++) {
 			for (int j = 0; j < numRows; j++) {
 				if (graph[i][j] != null) {
-					if (graph[i][j].getDist() <= player.getMaxMoveDistance()
-							&& graph[i][j].getDist() > 0) {
-						curPlayerMoves[i][j] = true;
-					} else {
-						curPlayerMoves[i][j] = false;
-					}
+					curPlayerMoves[i][j] = graph[i][j];
 				} else {
-					curPlayerMoves[i][j] = false;
+					curPlayerMoves[i][j] = null;
 				}
 			}
 		}
@@ -201,7 +208,13 @@ public class Battle {
 
 	public boolean curPlayerCanMoveTo(int col, int row) {
 		if(curPlayer.getActionPoints() >  0){
-			return curPlayerMoves[col][row];
+			if(curPlayerMoves[col][row] != null &&
+					curPlayerMoves[col][row].getDist() <= curPlayer.getMaxMoveDistance()){
+				return true;
+			}
+			else{
+				return false;
+			}
 		}else{
 			return false;
 		}
@@ -406,17 +419,6 @@ public class Battle {
 		return terrain[col][row];
 	}
 
-	public void moveCurPlayer(int col, int row) {
-		curPlayer.move(col, row);
-		curPlayer.useActionPoints(1);
-		updateMoves(curPlayer);
-	}
-
-	public void move(Player movingPlayer, int col, int row){
-		movingPlayer.move(col, row);
-		updateMoves(curPlayer);
-	}
-
 	/**
 	 * has current player attack specified defender
 	 * @param defender currently selected player
@@ -472,9 +474,10 @@ public class Battle {
 					if(x == defender.getXValue() && y == defender.getYValue()) continue;
 					Terrain t = terrain[x][y];
 					if(!t.isOccupied()){
-						if(!t.isTraversable){
+						if(t.isTraversable){
 							if(rand.nextInt(5) == 0){
-								move(defender, x, y);
+								defender.getXProperty().set(x);
+								defender.getYProperty().set(y);
 								return 4;
 							}
 						}
@@ -506,7 +509,6 @@ public class Battle {
 				System.err.println("COULD NOT FIND DEFENDER IN PLAYER ORDER");
 			}
 			terrain[defender.getXValue()][defender.getYValue()].leave();
-			updateMoves(curPlayer);
 			return 0;
 		}
 	}
@@ -529,6 +531,26 @@ public class Battle {
 	
 	public int getNumRows() {
 		return numRows;
+	}
+	
+	public Timeline getMovementAnimation(Player player, int col, int row){
+		Vertex curV = curPlayerMoves[col][row];
+		ArrayList<Vertex> path = new ArrayList<Vertex>();
+		while(curV != null){
+			path.add(0, curV);
+			curV = curV.getPrevious();
+		}
+		int index = 1;
+		Timeline moveTimeline = new Timeline();
+		moveTimeline.setCycleCount(1);
+		while(index < path.size()){
+			KeyValue xValue = new KeyValue(curPlayer.getXProperty(), path.get(index).getX());
+			KeyValue yValue = new KeyValue(curPlayer.getYProperty(), path.get(index).getY());
+			KeyFrame kf = new KeyFrame(Duration.millis(250*index), xValue, yValue);
+			moveTimeline.getKeyFrames().add(kf);
+			index++;
+		}
+		return moveTimeline;
 	}
 	
 	public Terrain[][] getTerrain() {

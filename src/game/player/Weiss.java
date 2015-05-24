@@ -5,6 +5,9 @@ import game.logic.Attack.AttackType;
 
 public class Weiss extends Player{
 	public Weiss(int x, int y){
+		sprite = "resources/images/weiss-sprite.png";
+		//TODO get weiss info pic
+		infoPic = "";
 		name = "Weiss";
 		description = "She may have ice in her veins, but that can come in handy on the battlefield. "
 				+ "Long range shots from her weapon Myrtenaster freeze enemies reducing agility and mobility";
@@ -19,7 +22,7 @@ public class Weiss extends Player{
 		
 		actionPoints.setValue(2);
 		
-		maxMoveDist = 4;
+		maxMoveDist.setValue(4);
 		
 		int speed = 9;
 		int power = 10;
@@ -40,5 +43,6 @@ public class Weiss extends Player{
 		Attack iceShot = new Attack(AttackType.RANGED, speed, power, maxRange,
 				name, damage);
 		this.rangedAttack = iceShot;
+		rangedStatusEffect = StatusType.FROZEN;
 	}
 }
