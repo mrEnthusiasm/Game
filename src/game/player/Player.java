@@ -7,6 +7,11 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.image.ImageView;
 
+/**
+ * Base class for all other player objects
+ * @author Daniel Schmidt
+ *
+ */
 public abstract class Player {
 	protected String sprite;
 	protected String infoPic;
@@ -193,7 +198,7 @@ public abstract class Player {
 		return meleeStatusEffect;
 	}
 	/**
-	 * run after every Player's turn complete. could use a better name.
+	 * run after every Player's turn complete.
 	 */
 	public void onTurnOver () {
 		boolean statusChanged = false;

@@ -5,8 +5,12 @@ import java.util.List;
 
 import game.BattleSelectionPage;
 import game.player.Player;
-import game.view.Battleground;
-
+import game.ui.Battleground;
+/**
+ * Abstract class defining common features of all levels
+ * @author Daniel Schmidt
+ *
+ */
 public abstract class Level {
 	BattleSelectionPage battlefieldPage;
 	Battleground battleground;
@@ -22,11 +26,12 @@ public abstract class Level {
 		
 	}
 	
-	
 	public abstract void addPlayers();
 	
 	public abstract void createMap();
-	
+	/**
+	 * resets level to starting state. used to initialize the level in Level constructor.
+	 */
 	public void retry() {
 		allies = new ArrayList<Player>();
 		enemies = new ArrayList<Player>();

@@ -1,4 +1,4 @@
-package game.view;
+package game.ui;
 
 import game.logic.Terrain;
 import javafx.geometry.Insets;

@@ -2,6 +2,11 @@ package game.logic;
 
 import javafx.beans.property.SimpleIntegerProperty;
 
+/**
+ * Class defining an attacks attributes.
+ * @author Daniel Schmidt
+ *
+ */
 public class Attack {
 	private AttackType type;
 	private SimpleIntegerProperty speed = new SimpleIntegerProperty();
@@ -28,6 +33,17 @@ public class Attack {
 		}
 	}
 
+	/**
+	 * Constructor used by Yang object where damage is a property instead of an int.
+	 * Yang's damage changes based on how many hits she takes. Making damage a property
+	 * allows the UI to reflect its changing value.
+	 * @param type AttackType enum
+	 * @param speed
+	 * @param power
+	 * @param maxRange
+	 * @param name 
+	 * @param damage
+	 */
 	public Attack(AttackType type, int speed, int power, double maxRange,
 			String name, SimpleIntegerProperty damage) {
 		this.type = type;

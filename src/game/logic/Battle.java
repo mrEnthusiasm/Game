@@ -17,6 +17,12 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 
+/**
+ * Main class for keeping track of the game state.
+ * 
+ * @author Daniel Schmidt
+ *
+ */
 public class Battle {
 	private Terrain[][] terrain;
 	private int numCols;
@@ -30,7 +36,7 @@ public class Battle {
 	private Player curPlayer;
 	private Vertex[][] curPlayerMoves;
 	private boolean alliesTurn = true;
-	
+
 	Random rand = new Random();
 
 	public Battle(Map map, List<Player> allyList, List<Player> enemyList) {
@@ -57,12 +63,12 @@ public class Battle {
 		} else {
 			totalRounds = enemies.size();
 		}
-		
-		for(int i=0; i<totalRounds; i++){
-			if(i < allies.size()){
+
+		for (int i = 0; i < totalRounds; i++) {
+			if (i < allies.size()) {
 				playerOrder.add(allies.get(i));
 			}
-			if(i < enemies.size()){
+			if (i < enemies.size()) {
 				playerOrder.add(enemies.get(i));
 			}
 		}
@@ -76,21 +82,23 @@ public class Battle {
 	public void nextPlayer() {
 		curPlayer.resetActionPoints();
 		round++;
-		if(round >= playerOrder.size()){
+		if (round >= playerOrder.size()) {
 			round = 0;
 		}
 		curPlayer = playerOrder.get(round);
-		if(allies.contains(curPlayer)){
+		if (allies.contains(curPlayer)) {
 			alliesTurn = true;
-		}else{
+		} else {
 			alliesTurn = false;
 		}
 		updateMoves(curPlayer, curPlayer.getXValue(), curPlayer.getYValue());
 	}
 
 	/**
-	 * variation on Dijkstra's algorithm, used to find all squares with path lengths 
-	 * less than player's max move distance and update curPlayerMoves array
+	 * variation on Dijkstra's algorithm, used to find all squares with path
+	 * lengths less than player's max move distance and update curPlayerMoves
+	 * array
+	 * 
 	 * @param player
 	 */
 	public void updateMoves(Player player, int startingCol, int startingRow) {
@@ -124,7 +132,8 @@ public class Battle {
 									&& (cur != origin)
 									&& player.getClass() != Ruby.class) {
 								// square is in 'area of control' of enemy
-								// player thus is a dead end unless origin square
+								// player thus is a dead end unless origin
+								// square
 								// but Ruby is special so she get's to ignore it
 								cur.getNeighbors().clear();
 								stop = true; // to break out of outer for loop
@@ -190,7 +199,7 @@ public class Battle {
 			}
 		}
 
-		//update curplayerMoves array
+		// update curplayerMoves array
 		for (int i = 0; i < numCols; i++) {
 			for (int j = 0; j < numRows; j++) {
 				if (graph[i][j] != null) {
@@ -202,22 +211,38 @@ public class Battle {
 		}
 	}
 
+	/**
+	 * Checks if player has enough action points to move as well as if the
+	 * distance in curPlayerMoves array is less than or equal to the current
+	 * player's max move distance. A null value in the array indicates
+	 * updateMoves never got to that square and its distance is greater than
+	 * current player's max move distance.
+	 * 
+	 * @param col
+	 * @param row
+	 * @return true if the player can move to square (col, row), otherwise false
+	 */
 	public boolean curPlayerCanMoveTo(int col, int row) {
-		if(curPlayer.getActionPoints() >  0){
-			if(curPlayerMoves[col][row] != null &&
-					curPlayerMoves[col][row].getDist() <= curPlayer.getMaxMoveDistance()){
+		if (curPlayer.getActionPoints() > 0) {
+			if (curPlayerMoves[col][row] != null
+					&& curPlayerMoves[col][row].getDist() <= curPlayer
+							.getMaxMoveDistance()) {
 				return true;
-			}
-			else{
+			} else {
 				return false;
 			}
-		}else{
+		} else {
 			return false;
 		}
 	}
 
-	// private helper functions for canMelee and canRanged to find gcd
-	// can't believe this isn't in Math
+	/**
+	 * Helper function for has cover. finds GCD of num1 and num2
+	 * 
+	 * @param num1
+	 * @param num2
+	 * @return greatest common denominator
+	 */
 	private static int findGCD(int num1, int num2) {
 		if (num2 == 0) {
 			return num1;
@@ -226,7 +251,8 @@ public class Battle {
 	}
 
 	/**
-	 * determines if a square at (col, row) provides cover or not
+	 * A sqaure provides cover if it either is of a terrain type that provides
+	 * cover (ie TreeTerrain) or is occupied by a Player
 	 */
 	private boolean providesCover(int col, int row) {
 		Terrain t = terrain[col][row];
@@ -240,19 +266,28 @@ public class Battle {
 	}
 
 	/**
-	 * checks all squares in a straight line between cur player and col, row for
-	 * squares that provide cover. returns List<[x,y]> of squares
-	 * @param col starting x location
-	 * @param row startying y location
-	 * @param xDist distance to target along x axis
-	 * @param yDist distance to target along y axis
+	 * Imagine a straight line between square[col, row] and sqaure[col+xDist,
+	 * row+yDist]. This function checks all squares along that line if they
+	 * provide cover.
+	 * 
+	 * @param col
+	 *            starting x location
+	 * @param row
+	 *            startying y location
+	 * @param xDist
+	 *            distance to target along x axis
+	 * @param yDist
+	 *            distance to target along y axis
+	 * @return true if a sqaure along the line of sight between the two squares
+	 *         provides cover, otherwise false
 	 */
 	private boolean hasCover(int col, int row, int xDist, int yDist) {
 		/*
-		 * TODO Have a cascade problem of being under cover in a line
-		 * for example R can not shoot any of G because of T and cover rules
-		 *  R
-		 *     TGGGGGGGGGGGGGGGGG
+		 * TODO Have a cascade problem of being under cover in a line. For
+		 * example R can not shoot any G. R TGGGGGGGGGGGGGGGGG This occurs
+		 * because you can only shoot a player if you can draw a straight line
+		 * to the center of their square, but a player can provide cover if line
+		 * of sight passes through ANY part of their square
 		 */
 		int gcd = Math.abs(findGCD(xDist, yDist));
 		int rise = yDist / gcd;
@@ -276,7 +311,7 @@ public class Battle {
 			if (Math.abs(run) % 2 == 1 && Math.abs(rise) % 2 == 1) {
 				intersection = true;
 				intersect = Math.abs(run);
-				count = (int)(Math.abs(run)*0.5);
+				count = (int) (Math.abs(run) * 0.5);
 			}
 			extra += (Math.abs(m) / 2); // moving to edge of square
 			step = run / Math.abs(run); // normalizes the vector
@@ -300,12 +335,12 @@ public class Battle {
 					}
 				}
 				extra += Math.abs(m);
-				if (extra > 1 && (count+1 != intersect)) {
+				if (extra > 1 && (count + 1 != intersect)) {
 					curY += Math.signum(rise);
 					// will never equal destination from extra move
 					if (providesCover(curX, curY)) {
 						return false;
-					}else{
+					} else {
 						extra -= 1;
 					}
 				}
@@ -314,14 +349,14 @@ public class Battle {
 			if (Math.abs(run) % 2 == 1 && Math.abs(rise) % 2 == 1) {
 				intersection = true;
 				intersect = Math.abs(rise);
-				count = (int)(Math.abs(rise)*0.5);
+				count = (int) (Math.abs(rise) * 0.5);
 			}
 			extra += (1 / (Math.abs(m) * 2)); // moving to edge of square
 			step = rise / Math.abs(rise); // normalizes the vector
 			while (true) {
 				curY += step;
 				count++;
-				if (intersection && (count==intersect)) {
+				if (intersection && (count == intersect)) {
 					curX += Math.signum(run);
 					extra = 1 / Math.abs(m);
 					count = 0;
@@ -338,12 +373,12 @@ public class Battle {
 					}
 				}
 				extra += (1 / Math.abs(m));
-				if (extra > 1 && (count+1 != intersect)) {
+				if (extra > 1 && (count + 1 != intersect)) {
 					curX += Math.signum(run);
 					// will never equal destination from extra move
 					if (providesCover(curX, curY)) {
 						return false;
-					}else{
+					} else {
 						extra -= 1;
 					}
 				}
@@ -362,6 +397,17 @@ public class Battle {
 		}
 	}
 
+	/**
+	 * Determines if square[col, row] contains a player, if the current player
+	 * has any action points, and if the square is within melee distance.
+	 * Currently set up to allow for melee ranges greater than 1, however does
+	 * not check if squares in between attacker and defender provide cover.
+	 * 
+	 * @param col
+	 * @param row
+	 * @return true if square[col, row] contains a player that can be meleed,
+	 *         otherwise false
+	 */
 	public boolean curPlayerCanMelee(int col, int row) {
 		if (curPlayer.getActionPoints() == 0) {
 			return false;
@@ -381,6 +427,16 @@ public class Battle {
 		}
 	}
 
+	/**
+	 * Determines if square[col, row] contains a player, if the current player
+	 * has any action points, if the square is within ranged distance, and if
+	 * the defender is under cover.
+	 * 
+	 * @param col
+	 * @param row
+	 * @return true if square[col, row] contains a player that can be range
+	 *         attacked, otherwise false
+	 */
 	public boolean curPlayerCanRanged(int col, int row) {
 		if (curPlayer.getActionPoints() == 0) {
 			return false;
@@ -403,6 +459,12 @@ public class Battle {
 		return curPlayer;
 	}
 
+	/**
+	 * 
+	 * @param col
+	 * @param row
+	 * @return player at sqaure[col, row], if unoccupied returns null
+	 */
 	public Player getPlayerAt(int col, int row) {
 		if (terrain[col][row].isOccupied()) {
 			return terrain[col][row].getResident();
@@ -411,21 +473,30 @@ public class Battle {
 		}
 	}
 
+	/**
+	 * 
+	 * @param col
+	 * @param row
+	 * @return terrain at location sqaure[col, row]
+	 */
 	public Terrain getSquare(int col, int row) {
 		return terrain[col][row];
 	}
 
 	/**
-	 * has current player attack specified defender
-	 * @param defender currently selected player
-	 * @param type attack type as specified in Attack class
+	 * Current player attacks specified defender
+	 * 
+	 * @param defender
+	 *            currently selected player
+	 * @param type
+	 *            attack type as specified in Attack class
 	 * @return returns info on if attack succeeded. 0 = death, 1 = damaged, 2 =
-	 *         blocked, 3 = dodged, 4 = blake dodge
+	 *         blocked, 3 = dodged, 4 = Blake dodge
 	 */
-	
+
 	public int curPlayerAttack(Player defender, AttackType type) {
 		Attack attack = null;
-		switch(type) {
+		switch (type) {
 		case MELEE:
 			attack = curPlayer.getMelee();
 			break;
@@ -433,45 +504,48 @@ public class Battle {
 			attack = curPlayer.getRanged();
 			break;
 		case SPECIAL:
-			//TODO come up with good framework for special attacks
+			// TODO come up with good framework for special attacks
 			break;
 		}
 		curPlayer.useActionPoints(1);
-		//check speed vs agility
+		// check speed vs agility
 		int speed = attack.getSpeedValue() + addDTwenty();
 		int agility = defender.getAgilityRating().get() + addDTwenty();
-		if(agility > speed){
+		if (agility > speed) {
 			return 3;
 		}
-		//check power vs armor
+		// check power vs armor
 		int power = attack.getPowerValue() + addDTwenty();
 		int armor = defender.getArmorRating().get() + addDTwenty();
-		int armorDamage = (int)(power*0.2);
-		if(armor > power){
-			//subtract a bit of armor
-			if(armorDamage < defender.getArmorRating().get()){
+		int armorDamage = (int) (power * 0.2);
+		if (armor > power) {
+			// subtract a bit of armor
+			if (armorDamage < defender.getArmorRating().get()) {
 				defender.takeArmorDamage(armorDamage);
 			} else {
 				defender.getArmorRating().set(0);
 			}
 			return 2;
 		}
-		//Extra bit of code for Blake
-		if(defender.getClass().equals(Blake.class)){
+		// Extra bit of code for Blake
+		if (defender.getClass().equals(Blake.class)) {
 			int x;
 			int y;
 			Random rand = new Random();
-			for(int i=0; i<3; i++){
-				for(int j=0; j<3; j++){
-					x = defender.getXValue()-1 + i;
-					y = defender.getYValue()-1 + j;
-					if(x<0 || y<0) continue;
-					if(x>=terrain.length || y>=terrain[0].length) continue;
-					if(x == defender.getXValue() && y == defender.getYValue()) continue;
+			for (int i = 0; i < 3; i++) {
+				for (int j = 0; j < 3; j++) {
+					x = defender.getXValue() - 1 + i;
+					y = defender.getYValue() - 1 + j;
+					if (x < 0 || y < 0)
+						continue;
+					if (x >= terrain.length || y >= terrain[0].length)
+						continue;
+					if (x == defender.getXValue() && y == defender.getYValue())
+						continue;
 					Terrain t = terrain[x][y];
-					if(!t.isOccupied()){
-						if(t.isTraversable){
-							if(rand.nextInt(5) == 0){
+					if (!t.isOccupied()) {
+						if (t.isTraversable) {
+							if (rand.nextInt(5) == 0) {
 								defender.getXProperty().set(x);
 								defender.getYProperty().set(y);
 								return 4;
@@ -481,75 +555,88 @@ public class Battle {
 				}
 			}
 		}
-		//attack succeeded
-		//subtract a bit of armor
-		if(armorDamage < defender.getArmorRating().get()){
+		// attack succeeded
+		// subtract a bit of armor
+		if (armorDamage < defender.getArmorRating().get()) {
 			defender.takeArmorDamage(armorDamage);
-			
+
 		} else {
 			defender.getArmorRating().set(0);
 		}
-		//provide damage
+		// provide damage
 		int damage = attack.getDamageProperty().get();
-		if(damage < defender.getHealth().get()){
+		if (damage < defender.getHealth().get()) {
 			defender.takeDamage(damage);
 			return 1;
-		}else{
+		} else {
 			damage = defender.getHealth().get();
 			defender.takeDamage(damage);
-			if(!enemies.remove(defender)){
-				if(!allies.remove(defender)){
-					System.err.println("COULD NOT FIND DEFENDER IN LISTS OF PLAYERS");
+			if (!enemies.remove(defender)) {
+				if (!allies.remove(defender)) {
+					System.err
+							.println("COULD NOT FIND DEFENDER IN LISTS OF PLAYERS");
 				}
 			}
-			if(!playerOrder.remove(defender)){
+			if (!playerOrder.remove(defender)) {
 				System.err.println("COULD NOT FIND DEFENDER IN PLAYER ORDER");
 			}
 			terrain[defender.getXValue()][defender.getYValue()].leave();
 			return 0;
 		}
 	}
-	
+
 	/**
 	 * provides psuedorandom d20 dice roll
+	 * 
 	 * @return value between 1-20 inclusive
 	 */
-	private int addDTwenty(){
-		return rand.nextInt(21)+1;
+	private int addDTwenty() {
+		return rand.nextInt(21) + 1;
 	}
-	
-	public boolean isBadGuysTurn(){
+
+	public boolean isBadGuysTurn() {
 		return !alliesTurn;
 	}
 
 	public int getNumCols() {
 		return numCols;
 	}
-	
+
 	public int getNumRows() {
 		return numRows;
 	}
-	
-	public Timeline getMovementAnimation(Player player, int col, int row){
+
+	/**
+	 * Creates and returns a timeline animation of the player moving through
+	 * every square along the path between its current location and sqaure[col, row]
+	 * @param player player to move
+	 * @param col destination column
+	 * @param row destination row
+	 * @return A Timeline animation
+	 */
+	public Timeline getMovementAnimation(Player player, int col, int row) {
 		Vertex curV = curPlayerMoves[col][row];
 		ArrayList<Vertex> path = new ArrayList<Vertex>();
-		while(curV != null){
+		while (curV != null) {
 			path.add(0, curV);
 			curV = curV.getPrevious();
 		}
 		int index = 1;
 		Timeline moveTimeline = new Timeline();
 		moveTimeline.setCycleCount(1);
-		while(index < path.size()){
-			KeyValue xValue = new KeyValue(curPlayer.getXProperty(), path.get(index).getX());
-			KeyValue yValue = new KeyValue(curPlayer.getYProperty(), path.get(index).getY());
-			KeyFrame kf = new KeyFrame(Duration.millis(250*index), xValue, yValue);
+		while (index < path.size()) {
+			KeyValue xValue = new KeyValue(curPlayer.getXProperty(), path.get(
+					index).getX());
+			KeyValue yValue = new KeyValue(curPlayer.getYProperty(), path.get(
+					index).getY());
+			KeyFrame kf = new KeyFrame(Duration.millis(250 * index), xValue,
+					yValue);
 			moveTimeline.getKeyFrames().add(kf);
 			index++;
 		}
 		return moveTimeline;
 	}
-	
+
 	public Terrain[][] getTerrain() {
 		return terrain;
 	}
@@ -558,23 +645,32 @@ public class Battle {
 		return allies.contains(p);
 	}
 
+	/**
+	 * Checks for end game.
+	 * @return int value indicating if the game is over and who won. 2 = bad guys won,
+	 * 1 = good guys won, 0 = game is not over.
+	 */
 	public int checkForEndGame() {
-		if(allies.size() == 0){
+		if (allies.size() == 0) {
 			return 2;
-		}else if(enemies.size() == 0){
+		} else if (enemies.size() == 0) {
 			return 1;
-		}else{
+		} else {
 			return 0;
 		}
-		
+
 	}
-	
+
 	public int getNumberOfPlayers() {
 		return playerOrder.size();
 	}
-	
+
+	/**
+	 * Player class has a method, onTurnOver(), that needs to be called at the end of
+	 * every turn. This is a convenience method to call that method for every player.
+	 */
 	public void updatePlayers() {
-		for(Player p: playerOrder){
+		for (Player p : playerOrder) {
 			p.onTurnOver();
 		}
 	}

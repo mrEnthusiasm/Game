@@ -1,4 +1,4 @@
-package game.view;
+package game.ui;
 
 import game.battles.Map;
 import game.player.Player;

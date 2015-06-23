@@ -7,7 +7,7 @@ Organization:
 	-battles: level design and specification
 	-logic: game state information and enemy AI
 	-player: player class information including allies and enemies (Ruby, Beoworlf, etc)
-	-view: classes specifying the layout of game info
+	-ui: classes specifying the layout of game info
 	
 -VN Folder: all files related to the visual novel portion of the game
 

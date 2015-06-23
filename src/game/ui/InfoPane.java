@@ -1,4 +1,4 @@
-package game.view;
+package game.ui;
 
 import game.logic.Attack;
 import game.logic.Terrain;

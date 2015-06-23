@@ -2,6 +2,11 @@ package game.logic;
 
 import java.util.ArrayList;
 
+/**
+ * Used by any method using Dijkstra's algorithm as the nodes of the graph it creates
+ * @author Daniel Schmidt
+ *
+ */
 public class Vertex implements Comparable<Vertex> {
 	private float minDist;
 	private int x;

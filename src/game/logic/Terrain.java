@@ -2,6 +2,11 @@ package game.logic;
 
 import game.player.Player;
 
+/**
+ * Base class for all other Terrain classes.
+ * @author Daniel Schmidt
+ *
+ */
 public abstract class Terrain {
 	private boolean occupied = false;
 	private Player resident;

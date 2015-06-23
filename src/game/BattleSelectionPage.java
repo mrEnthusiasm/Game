@@ -10,7 +10,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
+/**
+ * Main page for stand alone level selection
+ * @author Daniel Schmidt
+ *
+ */
 public class BattleSelectionPage extends BorderPane{
 	public Stage primaryStage;
 	BorderPane mainMenu;
@@ -65,7 +69,9 @@ public class BattleSelectionPage extends BorderPane{
 	public void closeLevel() {
 		primaryStage.getScene().setRoot(this);
 	}
-	
+	/**
+	 * return to main menu
+	 */
 	private void openMainMenu() {
 		primaryStage.getScene().setRoot(mainMenu);
 	}

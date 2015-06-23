@@ -1,4 +1,4 @@
-package game.view;
+package game.ui;
 
 import javafx.scene.control.Dialog;
 

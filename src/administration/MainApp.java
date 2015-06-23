@@ -10,7 +10,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import vn.StoryPage;
-
+/**
+ * The main entry point of of the application 
+ * @author Daniel Schmidt
+ *
+ */
 public class MainApp extends Application {
 	private Stage primaryStage;
 	BorderPane rootLayout;
@@ -26,27 +30,28 @@ public class MainApp extends Application {
 	}
 
 	public void initRootLayout() {
-		VBox mainMenu = new VBox();
-		mainMenu.setSpacing(10.0);
 		Text title = new Text("Pre-Alpha 0.0.1");
 		title.getStyleClass().add("title-text");
+		
 		Button campaign = new Button("Campaign");
 		campaign.setOnAction(e -> openCampaign());
+		
 		Button battlegrounds = new Button("Battlegrounds");
 		battlegrounds.setOnAction(e -> openBattleGrounds());
+		
 		Button settings = new Button("Settings");
 		settings.setOnAction(e -> openSettings());
 		settings.setDisable(true);
+		
+		VBox mainMenu = new VBox();
+		mainMenu.setSpacing(10.0);
 		mainMenu.getChildren().addAll(title, campaign, battlegrounds, settings);
 		mainMenu.setAlignment(Pos.CENTER);
 		
-		rootLayout = new BorderPane();
 		BorderPane.setAlignment(mainMenu, Pos.CENTER);
+		rootLayout = new BorderPane();
 		rootLayout.setCenter(mainMenu);
 		
-		//not sure if I like this here, but it has to come after
-		//rootLayout = new BorderPane()
-		//may reorganize later
 		battlefieldPage = new BattleSelectionPage(primaryStage, rootLayout);
 		campaignPage = new StoryPage();
 		
@@ -68,7 +73,7 @@ public class MainApp extends Application {
 	}
 	
 	private void openSettings() {
-		//TODO
+		//TODO method to open the settings page
 	}
 
 	public static void main(String[] args) {

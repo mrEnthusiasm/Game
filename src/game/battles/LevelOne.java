@@ -9,7 +9,6 @@ public class LevelOne extends Level{
 
 	public LevelOne(BattleSelectionPage battlefieldPage) {
 		super(battlefieldPage);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
